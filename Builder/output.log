@@ -1,0 +1,121 @@
+Generated structure of distributable folder
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  TestMod -> D:\code\csharp\OSLoader\TestMod\TestMod\bin\Release\netstandard2.0\TestMod.dll
+          1 file(s) copied.
+  OSLoader -> D:\code\csharp\OSLoader\OSLoader\OSLoader\bin\Release\netstandard2.0\OSLoader.dll
+          1 file(s) copied.
+          1 file(s) copied.
+          1 file(s) copied.
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:00.79
+
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  OSLoader -> D:\code\csharp\OSLoader\OSLoader\OSLoader\bin\Release\netstandard2.0\OSLoader.dll
+          1 file(s) copied.
+          1 file(s) copied.
+          1 file(s) copied.
+  Installer -> D:\code\csharp\OSLoader\Installer\Installer\bin\Release\net8.0\Installer.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:00.74
+
+Copying DLL Mono.Security.dll because it did not exist
+Copying DLL mscorlib.dll because it did not exist
+Copying DLL netstandard.dll because it did not exist
+Copying DLL System.ComponentModel.Composition.dll because it did not exist
+Copying DLL System.Configuration.dll because it did not exist
+Copying DLL System.Core.dll because it did not exist
+Copying DLL System.Data.dll because it did not exist
+Copying DLL System.Diagnostics.StackTrace.dll because it did not exist
+Copying DLL System.dll because it did not exist
+Copying DLL System.Drawing.dll because it did not exist
+Copying DLL System.EnterpriseServices.dll because it did not exist
+Copying DLL System.Globalization.Extensions.dll because it did not exist
+Copying DLL System.IO.Compression.dll because it did not exist
+Copying DLL System.IO.Compression.FileSystem.dll because it did not exist
+Copying DLL System.Net.Http.dll because it did not exist
+Copying DLL System.Numerics.dll because it did not exist
+Copying DLL System.Runtime.Serialization.dll because it did not exist
+Copying DLL System.Runtime.Serialization.Xml.dll because it did not exist
+Copying DLL System.ServiceModel.Internals.dll because it did not exist
+Copying DLL System.Transactions.dll because it did not exist
+Copying DLL System.Xml.dll because it did not exist
+Copying DLL System.Xml.Linq.dll because it did not exist
+Copying DLL System.Xml.XPath.XDocument.dll because it did not exist
+Copying DLL Unity.TextMeshPro.dll because it did not exist
+Copying DLL Unity.Timeline.dll because it did not exist
+Copying DLL UnityEngine.AccessibilityModule.dll because it did not exist
+Copying DLL UnityEngine.AIModule.dll because it did not exist
+Copying DLL UnityEngine.AndroidJNIModule.dll because it did not exist
+Copying DLL UnityEngine.AnimationModule.dll because it did not exist
+Copying DLL UnityEngine.ARModule.dll because it did not exist
+Copying DLL UnityEngine.AssetBundleModule.dll because it did not exist
+Copying DLL UnityEngine.AudioModule.dll because it did not exist
+Copying DLL UnityEngine.ClothModule.dll because it did not exist
+Copying DLL UnityEngine.ClusterInputModule.dll because it did not exist
+Copying DLL UnityEngine.ClusterRendererModule.dll because it did not exist
+Copying DLL UnityEngine.CoreModule.dll because it did not exist
+Copying DLL UnityEngine.CrashReportingModule.dll because it did not exist
+Copying DLL UnityEngine.DirectorModule.dll because it did not exist
+Copying DLL UnityEngine.dll because it did not exist
+Copying DLL UnityEngine.DSPGraphModule.dll because it did not exist
+Copying DLL UnityEngine.GameCenterModule.dll because it did not exist
+Copying DLL UnityEngine.GridModule.dll because it did not exist
+Copying DLL UnityEngine.HotReloadModule.dll because it did not exist
+Copying DLL UnityEngine.ImageConversionModule.dll because it did not exist
+Copying DLL UnityEngine.IMGUIModule.dll because it did not exist
+Copying DLL UnityEngine.InputLegacyModule.dll because it did not exist
+Copying DLL UnityEngine.InputModule.dll because it did not exist
+Copying DLL UnityEngine.JSONSerializeModule.dll because it did not exist
+Copying DLL UnityEngine.LocalizationModule.dll because it did not exist
+Copying DLL UnityEngine.ParticleSystemModule.dll because it did not exist
+Copying DLL UnityEngine.PerformanceReportingModule.dll because it did not exist
+Copying DLL UnityEngine.Physics2DModule.dll because it did not exist
+Copying DLL UnityEngine.PhysicsModule.dll because it did not exist
+Copying DLL UnityEngine.ProfilerModule.dll because it did not exist
+Copying DLL UnityEngine.ScreenCaptureModule.dll because it did not exist
+Copying DLL UnityEngine.SharedInternalsModule.dll because it did not exist
+Copying DLL UnityEngine.SpriteMaskModule.dll because it did not exist
+Copying DLL UnityEngine.SpriteShapeModule.dll because it did not exist
+Copying DLL UnityEngine.StreamingModule.dll because it did not exist
+Copying DLL UnityEngine.SubstanceModule.dll because it did not exist
+Copying DLL UnityEngine.SubsystemsModule.dll because it did not exist
+Copying DLL UnityEngine.TerrainModule.dll because it did not exist
+Copying DLL UnityEngine.TerrainPhysicsModule.dll because it did not exist
+Copying DLL UnityEngine.TextCoreModule.dll because it did not exist
+Copying DLL UnityEngine.TextRenderingModule.dll because it did not exist
+Copying DLL UnityEngine.TilemapModule.dll because it did not exist
+Copying DLL UnityEngine.TLSModule.dll because it did not exist
+Copying DLL UnityEngine.UI.dll because it did not exist
+Copying DLL UnityEngine.UIElementsModule.dll because it did not exist
+Copying DLL UnityEngine.UIModule.dll because it did not exist
+Copying DLL UnityEngine.UmbraModule.dll because it did not exist
+Copying DLL UnityEngine.UNETModule.dll because it did not exist
+Copying DLL UnityEngine.UnityAnalyticsModule.dll because it did not exist
+Copying DLL UnityEngine.UnityConnectModule.dll because it did not exist
+Copying DLL UnityEngine.UnityTestProtocolModule.dll because it did not exist
+Copying DLL UnityEngine.UnityWebRequestAssetBundleModule.dll because it did not exist
+Copying DLL UnityEngine.UnityWebRequestAudioModule.dll because it did not exist
+Copying DLL UnityEngine.UnityWebRequestModule.dll because it did not exist
+Copying DLL UnityEngine.UnityWebRequestTextureModule.dll because it did not exist
+Copying DLL UnityEngine.UnityWebRequestWWWModule.dll because it did not exist
+Copying DLL UnityEngine.VehiclesModule.dll because it did not exist
+Copying DLL UnityEngine.VFXModule.dll because it did not exist
+Copying DLL UnityEngine.VideoModule.dll because it did not exist
+Copying DLL UnityEngine.VRModule.dll because it did not exist
+Copying DLL UnityEngine.WindModule.dll because it did not exist
+Copying DLL UnityEngine.XRModule.dll because it did not exist
+Copying OSLoaderContents files
+Generating loader_config.json
+Copying loader assetbundle
+Copying doorstop related files
+Copying Facepunch and installer related stuff
