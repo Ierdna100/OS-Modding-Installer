@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\code\\csharp\\OSLoader\\Installer\\Installer\\Installer.csproj": {}
+    "D:\\code\\csharp\\OS Modding Installer\\Installer\\Installer\\Installer.csproj": {}
   },
   "projects": {
-    "D:\\code\\csharp\\OSLoader\\Installer\\Installer\\Installer.csproj": {
+    "D:\\code\\csharp\\OS Modding Installer\\Installer\\Installer\\Installer.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\code\\csharp\\OSLoader\\Installer\\Installer\\Installer.csproj",
+        "projectUniqueName": "D:\\code\\csharp\\OS Modding Installer\\Installer\\Installer\\Installer.csproj",
         "projectName": "Installer",
-        "projectPath": "D:\\code\\csharp\\OSLoader\\Installer\\Installer\\Installer.csproj",
+        "projectPath": "D:\\code\\csharp\\OS Modding Installer\\Installer\\Installer\\Installer.csproj",
         "packagesPath": "C:\\Users\\ierdn\\.nuget\\packages\\",
-        "outputPath": "D:\\code\\csharp\\OSLoader\\Installer\\Installer\\obj\\",
+        "outputPath": "D:\\code\\csharp\\OS Modding Installer\\Installer\\Installer\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\ierdn\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -44,6 +44,16 @@
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
+          "dependencies": {
+            "CommandLineParser": {
+              "target": "Package",
+              "version": "[2.9.1, )"
+            },
+            "Octokit": {
+              "target": "Package",
+              "version": "[13.0.1, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",

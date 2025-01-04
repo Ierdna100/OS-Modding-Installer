@@ -1,49 +1,113 @@
-﻿using System;
-using System.IO;
+﻿using CommandLine;
+using Octokit;
 using Steamworks;
+using System;
 using System.Diagnostics;
+using System.IO;
+using System.IO.Compression;
+using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace Installer
 {
+    public class CLIArgs
+    {
+        [Option('u', "uninstall", HelpText = "Uninstall the OS Modding environnement along with all mods and the mod manager.")]
+        public bool Uninstall { get; set; }
+
+        //[Option('v', "install-doorstop-verbose", HelpText = "Install the verbose version (generates logs) for Doorstop.")]
+        //public bool InstallVerbose { get; set; }
+
+        //[Option('l', "log-verbose", HelpText = "Sets logging level to verbose for the installer.")]
+        //public bool Verbose {  get; set; }
+
+        [Option('y', HelpText = "Answers the equivalent of \"yes\" to all questions the installer will ask.")]
+        public bool SkipQuestions {  get; set; }
+
+        [Option('d', "update", HelpText = "Update the OS Modding environnement along with all mods and the mod manager.")]
+        public bool Update { get; set; }
+
+        [Option('i', "check-integrity", HelpText = "Checks the integrity of this installer, the mod manager and the game.")]
+        public bool CheckIntegrity { get; set; }
+
+        [Option('p', "platform", HelpText = "Sets the platform for which Doorstop and BepInEx should be installed for. Possible values are 'win-x64', 'win-x86', 'macos', 'linux-x64' or 'linux-x86'")]
+        public string Platform { get; set; }
+        
+        public override string ToString()
+        {
+            return "CLIArgs{Uninstall=" + Uninstall
+                //+ ", InstallVerbose=" + InstallVerbose
+                //+ ", Verbose=" + Verbose
+                + ", SkipQuestions=" + SkipQuestions
+                + ", Update=" + Update
+                + ", CheckIntegrity=" + CheckIntegrity
+                + ", Platform=" + Platform
+                + "}";
+        }
+    }
+
     public class Program
     {
         public const uint obenseuerAppId = 951240;
-        public const string OSLoaderFilepathName = @"OSLoader";
-        public const string obenseuerRelativeManagedFolder = @"Obenseuer_Data\Managed";
-        public const string installDataFilepath = @"./installData";
-        public const string newAssembliesFilepath = @"assemblies";
-        public const string OSLoaderFilepathContents = @"OSLoaderContents";
-        public const string modsFilepath = @"mods";
+        public const string gameName = "Obenseuer";
 
-        public const string winhttpAssemblyName = "winhttp.dll";
-        public const string doorstopConfig = "doorstop_config.ini";
+        public const string ghBIEOwner = "BepInEx";
+        public const string ghBIERepo = "BepInEx";
+        public const string ghProductHeaderValue = "obenseuer-modding-environment-installer";
 
-        public static int Main(string[] args)
+        private static CLIArgs args;
+        private static string installPath;
+        private static GitHubClient ghClient;
+
+        private static DateTime lastProgressReportTime = DateTime.Now;
+
+        public async static Task<int> Main(string[] args)
         {
-            int exitCode = 1;
-            try
+            var parsedArgs = Parser.Default.ParseArguments<CLIArgs>(args);
+            Program.args = parsedArgs.Value;
+
+            if (args.Where(s => s.Contains("-h") || s.Contains("--version")).Any() || parsedArgs.Errors.Any())
             {
-                exitCode = Setup(args);
+                return 0;
             }
-            catch { }
-            if (exitCode != 0)
+
+            installPath = ComputeAppInstallPath();
+
+            if (installPath == null)
             {
-                Console.WriteLine("Press any key to continue...");
+                return 1;
             }
+
+            ghClient = new GitHubClient(new Octokit.ProductHeaderValue(ghProductHeaderValue));
+
+            // If we got here, everything was properly initialized
+            if (Program.args.Uninstall)
+            {
+                Uninstall();
+            } 
+            else if (Program.args.Update)
+            {
+                await Install();
+            }
+            else if (Program.args.CheckIntegrity)
+            {
+                VerifyInstallerIntegrity();
+                VerifyGameIntegrity();
+            }
+            else
+            {
+                await Install();
+            }
+
+            Console.WriteLine("Press any key to continue...");
             Console.ReadKey();
-            return exitCode;
+
+            return 0;
         }
 
-        private static int Setup(string[] args)
+        private static string ComputeAppInstallPath()
         {
-            /* Arguments for the future:
-                uninstall: uninstalls the loader
-                doorstop-verbose: installs verbose version of doorstop
-                -y: Uses defaults for all installation parameters (like doorstop-verbose)
-                update: Update current installation
-                integrity: Check integrity of modloader
-                --force-install
-            */
             try
             {
                 SteamClient.Init(obenseuerAppId);
@@ -51,7 +115,7 @@ namespace Installer
             catch (Exception e)
             {
                 Console.WriteLine($"Could not run installer, SteamClient Initialization threw an error: {e}");
-                return 1;
+                return null;
             }
 
             if (!SteamApps.IsAppInstalled(obenseuerAppId))
@@ -64,97 +128,86 @@ namespace Installer
             string installPath = SteamApps.AppInstallDir(obenseuerAppId);
             SteamClient.Shutdown();
 
-            if (args.Length > 0 && !string.IsNullOrEmpty(args[0]) && args[0] == "uninstall")
-            {
-                Uninstall(installPath);
-                return 0;
-            }
-
-            Install(installPath);
-            return 0;
+            return installPath;
         }
 
-        private static void Install(string installPath)
+        private async static Task Install()
         {
-            // Initial checks
-            if (Directory.Exists(Path.Combine(installPath, OSLoaderFilepathName))
-                || File.Exists(Path.Combine(installPath, winhttpAssemblyName)))
+            string targetPlatformName = args.Platform switch
             {
-                Console.WriteLine("Could not run installer: OSLoader is already installed!");
-                Console.WriteLine("Are you missing a CLI argument (update or integrity)?");
-                return;
-            }
-            Console.WriteLine($"Found install directory at: {installPath}");
-            Console.WriteLine();
+                "linux-x64" => "linux_x64",
+                "linux-x86" => "linux_x86",
+                "macos" => "macos_x64",
+                "win-x64" => "win_x64",
+                "win-x32" => "win_x32",
+                _ => "win_x64"
+            };
+            string outputFilepath = Path.Combine(installPath, "bepinex-temp.zip");
 
-            // Replace game assemblies
-            Console.WriteLine("Replacing game assemblies with unstripped ones...");
-            string managedPath = Path.Combine(installPath, obenseuerRelativeManagedFolder);
-            string[] newAssembliesPaths = Directory.GetFiles(Path.Combine(installDataFilepath, newAssembliesFilepath));
-            int count = 1;
-            foreach (string file in newAssembliesPaths)
-            {
-                Console.WriteLine($"{(int)((double)count++ / newAssembliesPaths.Length * 100)}% - {Path.GetFileName(file)}");
-                File.Copy(file, Path.Combine(managedPath, Path.GetFileName(file)), true);
-            }
-            Console.WriteLine();
+            Console.WriteLine("Installing BepInEx from Github for platform {0} at filepath: {1}", targetPlatformName, outputFilepath);
+            await DownloadFromGithub("BepInEx", ghBIEOwner, ghBIERepo, (r) => !r.Prerelease, (asset) => asset.Name.Contains(targetPlatformName), outputFilepath);
 
-            // Doorstop files
-            Console.WriteLine("Copying doorstop files...");
-            File.Copy(Path.Combine(installDataFilepath, winhttpAssemblyName), Path.Combine(installPath, winhttpAssemblyName));
-            File.Copy(Path.Combine(installDataFilepath, doorstopConfig), Path.Combine(installPath, doorstopConfig));
-            Console.WriteLine("Copied doorstop files successfully.");
-            Console.WriteLine();
+            Console.WriteLine("Extracting BepInEx compressed file into {0}", installPath);
+            ZipFile.ExtractToDirectory(outputFilepath, installPath, true);
 
-            // Add OSLoader folder
-            Directory.CreateDirectory(Path.Combine(installPath, OSLoaderFilepathName));
-            Console.WriteLine("Created OSLoader directory.");
-            Console.WriteLine();
+            Console.WriteLine("Removing temporary files...");
+            File.Delete(outputFilepath);
 
-            // Copy dependencies into OSLoader folder
-            foreach (string file in Directory.GetFiles(Path.Combine(installDataFilepath, OSLoaderFilepathContents)))
-            {
-                string filename = Path.GetFileName(file);
-                Console.WriteLine($"Copying {filename}");
-                File.Copy(file, Path.Combine(installPath, OSLoaderFilepathName, filename));
-            }
-            Console.WriteLine();
-
-            // Create mods folder
-            Directory.CreateDirectory(Path.Combine(installPath, OSLoaderFilepathName, modsFilepath));
-            Console.WriteLine("Created OSLoader directory.");
-            Console.WriteLine();
-
-            // Copy winforms app
-            // DNE yet
-
-            Console.WriteLine("OSLoader installed! Press any key to continue...");
+            Console.WriteLine("Obenseuer modding environment installed!");
+            Console.WriteLine("You should run the game once with the environment installed to ensure all files are correctly generated.");
         }
 
-        private static void Uninstall(string installPath)
+        private static void Uninstall()
         {
-            // Delete everything in the OSLoader folder
-            Directory.Delete(Path.Combine(installPath, OSLoaderFilepathName), true);
+            File.Delete(Path.Combine(installPath, ".doorstop_version"));
+            File.Delete(Path.Combine(installPath, "changelog.txt"));
+            File.Delete(Path.Combine(installPath, "winhttp.dll"));
+            File.Delete(Path.Combine(installPath, "doorstop_config.ini"));
+            Directory.Delete(Path.Combine(installPath, "BepInEx"), true);
 
-            // Delete doorstop
-            File.Delete(Path.Combine(installPath, winhttpAssemblyName));
-            File.Delete(Path.Combine(installPath, doorstopConfig));
+            Console.WriteLine("Successfully uninstalled Obenseuer modding environment!");
+            Console.WriteLine("If you wish to remove the uninstaller, simply delete its parent folder, no other files exist.");
+        }
 
-            // Delete remaining doorstop logs
-            string[] files = Directory.GetFiles(installPath, "*.log");
-            foreach (string file in files)
+        private static void VerifyInstallerIntegrity()
+        {
+            // doing this later, not important now
+        }
+
+        private static async Task DownloadFromGithub(
+            string projectDisplayName, 
+            string owner, 
+            string repository, 
+            Func<Release, bool> releasePredicate, 
+            Func<ReleaseAsset, bool> assetPredicate,
+            string outputFilepath)
+        {
+            var releases = await ghClient.Repository.Release.GetAll(owner, repository);
+
+            Release target = releases.First(releasePredicate);
+            ReleaseAsset downloadAsset = target.Assets.First(assetPredicate);
+
+            var webClient = new HttpClient();
+            var downloadStream = await webClient.GetStreamAsync(downloadAsset.BrowserDownloadUrl);
+
+            FileStream outputFile = File.Create(outputFilepath);
+            FileInfo outputFileInfo = new(outputFilepath);
+            Task downloadTask = downloadStream.CopyToAsync(outputFile);
+
+            while (!downloadTask.IsCompletedSuccessfully)
             {
-                if (file.ToLower().Contains("doorstop_"))
+                if (DateTime.Now > lastProgressReportTime + new TimeSpan(10_000_000))
                 {
-                    Console.WriteLine("Deleting doorstop log file with path " + file);
-                    File.Delete(file);
+                    lastProgressReportTime = DateTime.Now;
+
+                    Console.WriteLine("Downloading '{0}': {1:F2}%", projectDisplayName, (float)outputFileInfo.Length / downloadAsset.Size * 100);
                 }
             }
 
-            // Verify game's integrity
-            VerifyGameIntegrity();
-            Console.WriteLine("Verifying game integrity on Steam...");
-            Console.WriteLine("You may now close this window by pressing any key. The uninstallation process will be done when Steam finishes validating the game files");
+            outputFile.Close();
+            downloadStream.Close();
+
+            Console.WriteLine("Successfully downloaded ");
         }
 
         private static void VerifyGameIntegrity()

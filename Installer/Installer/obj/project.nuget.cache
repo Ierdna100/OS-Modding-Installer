@@ -1,8 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "MhQp9G6fadA=",
+  "dgSpecHash": "FbRvG290YTp5nJGEaq3gD+DAUPqxphf2+PzBiVkxCSi2bfwvnn7oin+A+QzVm8KxlZusxqV8B6Q2WT1wNzqbhQ==",
   "success": true,
-  "projectFilePath": "D:\\code\\csharp\\OSLoader\\Installer\\Installer\\Installer.csproj",
-  "expectedPackageFiles": [],
+  "projectFilePath": "D:\\code\\csharp\\OS Modding Installer\\Installer\\Installer\\Installer.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\ierdn\\.nuget\\packages\\commandlineparser\\2.9.1\\commandlineparser.2.9.1.nupkg.sha512",
+    "C:\\Users\\ierdn\\.nuget\\packages\\octokit\\13.0.1\\octokit.13.0.1.nupkg.sha512"
+  ],
   "logs": []
 }
